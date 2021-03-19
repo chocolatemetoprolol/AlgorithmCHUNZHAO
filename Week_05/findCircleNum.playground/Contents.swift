@@ -12,14 +12,14 @@ class Solution {
                 num = num + 1
             }
         }
-        print(num)
+        print(num,res)
         return num
     }
 
     func dfs(_ isConnected: inout [[Int]],_ i:Int,_ visited: inout [Bool]) -> Void {
-        for j in 0..<isConnected.count {
+        visited[i] = true
+        for j in 1..<isConnected.count {
             if isConnected[i][j] == 1 && !visited[j] {
-                visited[j] = true
                 dfs(&isConnected, j, &visited)
             }
         }
@@ -27,4 +27,4 @@ class Solution {
 }
 
 let  so = Solution()
-so.findCircleNum([[1,0,0,1],[0,1,1,0],[0,1,1,1],[1,0,1,1]])
+so.findCircleNum([[1,1,0],[1,1,0],[0,0,1]])
