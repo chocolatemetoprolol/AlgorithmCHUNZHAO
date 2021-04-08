@@ -19,8 +19,46 @@ import UIKit
 
 class Solution {
     func threeSum(_ nums: [Int]) -> [[Int]] {
-        let arr = nums.sorted()
-        var res  = [Int]()
-        return [[1]]
+        if nums.count < 3 {
+            return []
+        }
+        var numsCopy = nums
+        var result = [[Int]]()
+        numsCopy.sort {return $0 < $1}
+        for i in 0...numsCopy.count - 1 {
+            if numsCopy[i] > 0 {
+                return result
+            }
+            if i > 0 && numsCopy[i] == numsCopy[i-1] {
+                continue//去重
+            }
+            let center = numsCopy[i]
+            var left = i+1
+            var right = numsCopy.count - 1
+            while left < right {
+                let sum = numsCopy[left] + numsCopy[right] + center
+                if sum == 0 {
+                    let arr = [center, numsCopy[left], numsCopy[right]]
+                    result.append(arr)
+                    while left < right && numsCopy[left] == numsCopy[left+1] {
+                        left += 1//左去重
+                    }
+                    while left < right && numsCopy[right] == numsCopy[right - 1] {
+                        right -= 1//右去重
+                    }
+                    left += 1
+                    right -= 1
+                } else if sum > 0{
+                    right -= 1
+                } else {
+                    left += 1
+                }
+            }
+        }
+        return result
     }
 }
+
+let so = Solution()
+let res = so.threeSum([-1,0,1,2,-1,-4])
+print(res)
