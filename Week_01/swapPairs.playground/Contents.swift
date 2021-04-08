@@ -1,66 +1,77 @@
 import UIKit
 /**
- 假设你正在爬楼梯。需要 n 阶你才能到达楼顶。
- 每次你可以爬 1 或 2 个台阶。你有多少种不同的方法可以爬到楼顶呢？
- 注意：给定 n 是一个正整数。
+ 给定一个链表，两两交换其中相邻的节点，并返回交换后的链表。
+ 你不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
  示例 1：
- 输入： 2
- 输出： 2
- 解释： 有两种方法可以爬到楼顶。
- 1.  1 阶 + 1 阶
- 2.  2 阶
+ 输入：head = [1,2,3,4]
+ 输出：[2,1,4,3]
  示例 2：
- 输入： 3
- 输出： 3
- 解释： 有三种方法可以爬到楼顶。
- 1.  1 阶 + 1 阶 + 1 阶
- 2.  1 阶 + 2 阶
- 3.  2 阶 + 1 阶
+ 输入：head = []
+ 输出：[]
+ 示例 3：
+ 输入：head = [1]
+ 输出：[1]
  来源：力扣（LeetCode）
- 链接：https://leetcode-cn.com/problems/climbing-stairs
+ 链接：https://leetcode-cn.com/problems/swap-nodes-in-pairs
  著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
  */
-class Solution {
-    func climbStairs(_ n: Int) -> Int {
-        if n <= 1 {
-           return n
-        }
-        var dp = [Int](repeating: 0, count: 3)
-        dp[1] = 1
-        dp[2] = 2
-        for _ in 3..<n+1 {
-            let sum = dp[1] + dp[2]
-            dp[1] = dp[2]
-            dp[2] = sum
-        }
-        return dp[2];
-    }
-}
 /**
- The problem seems to be a dynamic programming one. Hint: the tag also suggests that!
- Here are the steps to get the solution incrementally.
- Base cases:
- if n <= 0, then the number of ways should be zero.
- if n == 1, then there is only way to climb the stair.
- if n == 2, then there are two ways to climb the stairs.
- One solution is one step by another; the other one is two steps at one time.
- The key intuition to solve the problem is that given a number of stairs n, if we know the number ways to get to the points [n-1] and [n-2] respectively, denoted as n1 and n2 , then the total ways to get to the point [n] is n1 + n2. Because from the [n-1] point, we can take one single step to reach [n]. And from the [n-2] point, we could take two steps to get there.
- The solutions calculated by the above approach are complete and non-redundant. The two solution sets (n1 and n2) cover all the possible cases on how the final step is taken. And there would be NO overlapping among the final solutions constructed from these two solution sets, because they differ in the final step.
- Now given the above intuition, one can construct an array where each node stores the solution for each number n. Or if we look at it closer, it is clear that this is basically a fibonacci number, with the starting numbers as 1 and 2, instead of 1 and 1.
- The implementation in Swift as follows:
+ * Definition for singly-linked list.
  */
-func climbStairs(_ n: Int) -> Int {
-    guard n > 2 else {
-        return n
-    }
-    var one_step_before = 2
-    var two_steps_before = 1
-    var all_ways = 0
-    for i in 2..<n {
-        all_ways = one_step_before + two_steps_before;
-        two_steps_before = one_step_before;
-        one_step_before = all_ways;
-    }
-    return all_ways
+
+public class ListNode {
+     public var val: Int
+     public var next: ListNode?
+     public init() { self.val = 0; self.next = nil; }
+     public init(_ val: Int) { self.val = val; self.next = nil; }
+     public init(_ val: Int, _ next: ListNode?) { self.val = val; self.next = next; }
 }
-climbStairs(3)
+
+class Solution {
+    func swapPairs(_ head: ListNode?) -> ListNode? {
+          return iteration(head)
+    }
+
+    func iteration(_ head: ListNode?) -> ListNode? {
+        let pre = ListNode(0)
+        pre.next = head
+        var temp = pre
+        while temp.next != nil && temp.next?.next != nil {
+            var start = temp.next//start前进一位，指向1节点
+            var end = temp.next?.next//end前进两位，指向2节点
+            //这步很关键，tmp指针用来处理边界条件的
+            //假设链表是1->2->3->4，start指向1，end指向2
+            //改变start和end的指向，于是就变成2->1
+            //循环迭代的时候一次处理2个节点
+            temp.next = end//temp指向end
+            start?.next = end?.next//start 指向 end
+            end?.next = start// end 指向 start
+            temp = start as! ListNode// 0 2 1 4 3
+        }
+        return pre.next// pre = 0 2 1 4 3 pre.next = 2 1 4 3
+    }
+
+    func recursion(_ head: ListNode?) -> ListNode? {
+        //递归的终止条件
+        if head == nil || head?.next == nil {
+           return head
+        }
+        //假设链表是 1->2->3->4
+        //这句就先保存节点2
+        let newHead = head?.next
+        //继续递归，处理节点3->4
+        //当递归结束返回后，就变成了4->3
+        //于是head节点就指向了4，变成1->4->3
+        head?.next = recursion(newHead?.next)
+        //将2节点指向1,变成了2->1->4->3
+        newHead?.next = head
+        return newHead
+    }
+}
+
+let so = Solution()
+let four = ListNode(4)
+let three = ListNode(3,four)
+let two = ListNode(2,three)
+let one = ListNode(1,two)
+so.swapPairs(one)

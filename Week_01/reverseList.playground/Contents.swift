@@ -17,7 +17,7 @@ public class ListNode {
 
 class Solution {
     func reverseList(_ head: ListNode?) -> ListNode? {
-        return iteration(head)
+        return recursion(head)
     }
 
     func iteration(_ head: ListNode?) -> ListNode? {
